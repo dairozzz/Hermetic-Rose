@@ -1,0 +1,362 @@
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>hermetic.rose</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background-color: #191818;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 200vh;
+    padding: 40px;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .btn-subscribe-header {
+    background: #f0f0f3;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    font-weight: 600;
+    color: #2c2c38;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    user-select: none;
+  }
+  .btn-subscribe-header svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .btn-share-header {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+  }
+  .btn-share-header svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Perfil */
+  .profile {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .profile img {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 1.5px solid #eee;
+    object-fit: contain;
+    margin-bottom: 12px;
+    background-color: black;
+  }
+  .profile-name {
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  /* Iconos sociales horizontales */
+  .social-icons-inline {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 24px;
+  }
+  .social-icons-inline a {
+    color: #eee;
+    font-size: 28px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    user-select: none;
+  }
+
+  /* Botones links */
+  .link-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .link-button {
+    background: #fff;
+    color: #2c2c38;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 14px 20px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .link-button svg, .link-button img {
+    width: 26px;
+    height: 26px;
+  }
+  .link-button:hover {
+    background-color: #d7d7d7;
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.3);
+  }
+
+  /* Modal overlay: desenfoque fondo */
+  .modal-overlay {
+    display: none; /* oculto inicialmente */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    backdrop-filter: blur(6px);
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  /* Modal contenido */
+  .modal-content {
+    background: #5a5b73;
+    border-radius: 10px;
+    padding: 30px 25px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    position: relative;
+    color: #eee;
+  }
+
+  .modal-content strong {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .modal-content p {
+    font-size: 15px;
+    margin-bottom: 20px;
+    color: #c7c7dc;
+  }
+  .modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .modal-content input[type="text"],
+  .modal-content input[type="email"] {
+    padding: 10px 12px;
+    border-radius: 5px;
+    border: 1.5px solid #ccc;
+    font-size: 15px;
+    outline-offset: 2px;
+  }
+  .modal-content input[type="text"]:focus,
+  .modal-content input[type="email"]:focus {
+    border-color: #1db954;
+  }
+  .modal-content button[type="submit"] {
+    padding: 12px;
+    background: #1db954;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: background-color 0.3s ease;
+  }
+  .modal-content button[type="submit"]:hover {
+    background: #149443;
+  }
+
+  /* Botón cerrar modal */
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 26px;
+    font-weight: 700;
+    color: #eee;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 480px) {
+    .container {
+      max-width: 95vw;
+      padding: 0 5vw;
+    }
+    .profile img {
+      width: 80px;
+      height: 80px;
+    }
+    .social-icons-inline a {
+      font-size: 24px;
+      gap: 18px;
+    }
+    .link-button {
+      font-size: 15px;
+      padding: 12px 18px;
+    }
+    .link-button svg, .link-button img {
+      width: 22px;
+      height: 22px;
+    }
+    .modal-content {
+      padding: 25px 20px;
+      width: 95%;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="mainContainer">
+
+    <!-- Header con botón Subscribe y Share -->
+    <header>
+      <button id="btnSubscribeHeader" class="btn-subscribe-header" aria-label="Subscribe" type="button">
+        <!-- Icono campana -->
+        <svg fill="none" stroke="#2c2c38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" height="18" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 01-3.46 0"></path></svg> Subscribe
+      </button>
+
+      <button id="btnShare" class="btn-share-header" aria-label="Share" type="button" title="Compartir">
+        <!-- Icono share -->
+        <svg fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Perfil con logo -->
+    <section class="profile">
+      <img src="logohr.jpg" alt="hermetic.rose logo" />
+      <div class="profile-name">Hermetic rose</div>
+    </section>
+
+    <!-- Botones principales de acceso -->
+    <div class="link-buttons">
+      <a href="https://wa.me/573150055002" target="_blank" rel="noopener noreferrer" class="link-button" aria-label="WhatsApp">
+        <img src="whatsapp.png" alt="WhatsApp" />
+        WhatsApp
+      </a>
+
+      <a href="https://www.instagram.com/hermetic.rose/" target="_blank" rel="noopener noreferrer" class="link-button" aria-label="Instagram">
+        <img src="logotipo-de-instagram.png" alt="Instagram" />
+        Instagram
+      </a>
+
+      <a href="https://www.tiktok.com/@hrr.rose" target="_blank" rel="noopener noreferrer" class="link-button" aria-label="TikTok">
+        <img src="tik-tok.png" alt="TikTok" />
+        TikTok
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Modal para formulario suscripción -->
+  <div id="modalSubscribe" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <div class="modal-content">
+      <button id="modalClose" class="modal-close" aria-label="Cerrar">&times;</button>
+      <strong id="modalTitle">Subscribete a Hermetic rose</strong>
+      <p id="modalDesc">Registrate para tener contenido exclusivo de la mejor marca</p>
+      <form action="#" method="POST" onsubmit="alert('Gracias por suscribirte!'); closeModal(); return false;">
+        <input type="text" name="firstname" placeholder="Primer nombre" required autocomplete="given-name" />
+        <input type="email" name="email" placeholder="Correo" required autocomplete="email" />
+        <button type="submit">Subscribete</button>
+      </form>
+    </div>
+  </div>
+
+<script>
+  const btnSubscribe = document.getElementById('btnSubscribeHeader');
+  const modal = document.getElementById('modalSubscribe');
+  const modalClose = document.getElementById('modalClose');
+  const mainContainer = document.getElementById('mainContainer');
+  const btnShare = document.getElementById('btnShare');
+
+  function openModal() {
+    modal.classList.add('active');
+    // Deshabilitar scroll fondo
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modal.classList.remove('active');
+    // Habilitar scroll fondo
+    document.body.style.overflow = '';
+  }
+
+  btnSubscribe.addEventListener('click', openModal);
+  modalClose.addEventListener('click', closeModal);
+
+  // Cerrar modal con click fuera del contenido
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Permitir cerrar modal con tecla ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  // Botón Compartir
+  btnShare.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'hermetic.rose',
+          text: 'Visita hermetic.rose',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error('Error compartiendo:', err);
+      }
+    } else {
+      alert('Tu navegador no soporta la función de compartir nativa.');
+    }
+  });
+</script>
+</body>
+</html>
